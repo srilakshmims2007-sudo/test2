@@ -1,0 +1,252 @@
+//
+// TODO: CleverAds
+// iframe transparente no canto INFERIOR direito do input de texto principal.
+// <iframe sandbox="allow-scripts" src="dontpad.com/cleverads.html" style="background: transparent;" allowTransparency="true" frameborder="0"></iframe>
+//
+//
+//////////////////////// No console:
+//////////////////////// Tracker ID not found
+//////////////////////// (Isso é só pro caso da detecção de div vazia acima não funcionar)
+
+const footerAd = () => {
+  const result = document.createElement('div');
+  result.className = 'dontpad-free footer-div';
+  // TODO: do not user innerHTML
+  result.innerHTML = `
+  <div class="ad-btns-menu-footer">
+			<button class="btn-open-modal" onclick="removeAndRenderBuyModal()">Remove All Ads</button>
+		</div>
+
+		<div class="footer-content">
+      <!-- FooterResponsive -->
+      <ins class="adsbygoogle footer-ad"
+        style="display:block"
+        data-ad-client="ca-pub-2087915935349742"
+        data-ad-slot="5701473496">
+      </ins>
+		</div>
+  </div>
+  `;
+
+  return result;
+}
+
+const footerRemoveAdsButton = () => {
+  const buttonContainer = document.createElement('div');
+  buttonContainer.className = 'ad-btns-menu-footer';
+
+  const removeAdsButton = document.createElement('button');
+  removeAdsButton.className = 'btn-open-modal';
+  removeAdsButton.textContent = 'Remove All Ads';
+  removeAdsButton.addEventListener('click', removeAndRenderBuyModal);
+
+  buttonContainer.appendChild(removeAdsButton);
+
+  return buttonContainer;
+}
+
+const cleverRemoveAdsButton = () => {
+  const buttonContainer = document.createElement('div');
+  buttonContainer.className = 'ad-btns-menu-clever';
+
+  const removeAdsButton = document.createElement('button');
+  removeAdsButton.className = 'btn-open-modal';
+  removeAdsButton.textContent = 'Remove All Ads';
+  removeAdsButton.addEventListener('click', removeAndRenderBuyModal);
+
+  buttonContainer.appendChild(removeAdsButton);
+
+  return buttonContainer;
+}
+
+const displayFooterAdIfMissing = () => {
+  if (!document.querySelector('.footer-div')) {
+    displayFooterAd();
+    positionAbsoluteElements();
+  }
+}
+
+const removeCleverAdsOnAlternative = (adContainer, iframe) => {
+  const handleMessage = (ev) => {
+    if (ev.source !== iframe.contentWindow) return;
+    if (ev.data.type !== 'dontpad-remove-cleverads') return;
+
+    adContainer.remove();
+    displayFooterAdIfMissing();
+    window.removeEventListener('message', handleMessage);
+  };
+
+  window.addEventListener('message', handleMessage);
+}
+
+const leftAd = () => {
+  const result = document.createElement('div');
+  result.className = 'dontpad-free left-menu-div';
+  // TODO: do not user innerHTML
+  result.innerHTML = `
+  <button class="btn-menu" onclick="removeAndRenderBuyModal()"> Remove All Ads </button>
+
+  <!-- LeftResponsive -->
+  <div class="ad-div-left">
+    <ins class="adsbygoogle left-ad"
+      style="display:block"
+      data-ad-client="ca-pub-2087915935349742"
+      data-ad-slot="7753207178">
+    </ins>
+  </div>
+  `;
+
+  return result;
+}
+
+const rightAd = () => {
+  const result = document.createElement('div');
+  result.className = 'dontpad-free ad-div-right';
+  // TODO: do not user innerHTML
+  result.innerHTML = `
+    <button class="btn-menu" onclick="removeAndRenderBuyModal()"> Remove All Ads </button>
+
+    <!-- RightResponsive -->
+      <ins class="adsbygoogle right-ad"
+        style="display:block"
+        data-ad-client="ca-pub-2087915935349742"
+        data-ad-slot="6236390615">
+      </ins>
+  `;
+
+  return result;
+}
+
+const createCleverAdsIframe = () => {
+  const adContainer = document.createElement('div');
+  adContainer.className = 'dontpad-free clever-ads-container';
+
+  const iframe = document.createElement('iframe');
+  console.log(iframe, ' clever');
+
+  Object.assign(iframe, {
+    className: 'clever-ads',
+    // Its trowing an error because of the sandbox "allow-same-origin" might fix
+    // sandbox: 'allow-scripts allow-same-origin',
+    src: 'https://ads.dontpad.com/cleverads.html',
+    style: 'background: transparent;',
+    allowTransparency: 'true',
+    frameBorder: '0',
+    referrerPolicy: 'no-referrer', // Prevents for knowing url
+  });
+
+  console.log('createCleverAdsIframe');
+
+  // window.onmessage = (ev) => {
+  //   console.log(ev)
+  //   if (ev.data = "No ads.") {
+  //     iframe.remove()
+  //   }
+  // };
+
+  removeCleverAdsOnAlternative(adContainer, iframe);
+
+  adContainer.appendChild(iframe)
+  adContainer.appendChild(cleverRemoveAdsButton());
+  return adContainer
+}
+
+const createAkceloAdsIframe = () => {
+  const result = document.createElement('iframe');
+  result.classList.add('dontpad-free')
+  console.log(result, ' akcelo');
+
+  Object.assign(result, {
+    className: 'akcelo-ads',
+    sandbox: 'allow-scripts allow-popups allow-popups-to-escape-sandbox',
+    src: 'https://dontpad.com/akcelo.html',
+    style: 'background: red;',
+    allowTransparency: 'true',
+    frameBorder: '0',
+    referrerPolicy: 'no-referrer', // Prevents for knowing url
+  });
+
+  console.log('createAkceloAdsIframe');
+
+  // window.onmessage = (ev) => {
+  //   console.log(ev)
+  //   if (ev.data = "No ads.") {
+  //     result.remove()
+  //   }
+  // };
+
+  return result
+}
+
+
+const createAdsTestIframe = () => {
+  const result = document.createElement('div');
+  result.className = 'dontpad-free footer-div';
+  // TODO: do not user innerHTML
+  result.innerHTML = `
+  <div class="ad-btns-menu-footer">
+			<button class="btn-open-modal" onclick="removeAndRenderBuyModal()">Remove All Ads</button>
+		</div>
+
+		<div class="footer-content">
+      <!-- FooterResponsive -->
+      <iframe
+        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+        referrerpolicy="no-referrer"
+        src="https://ads.dontpad.com/profiton.html">
+      </iframe>
+		</div>
+  </div>
+  `;
+
+  return result;
+}
+
+const renderAd = (containerSelector, adElement, googleAds = true) => {
+  const container = document.querySelector(containerSelector);
+  container.appendChild(adElement);
+  if (googleAds) adsbygoogle.push({});
+}
+
+const displayLeftMenuAd = () => renderAd('#menu-div', leftAd());
+const displayRightMenuAd = () => renderAd('.dp-usable', rightAd());
+const displayFooterAd = () => renderAd('.dp-right-side', footerAd());
+const displayAdsTest =  () => renderAd('.dp-right-side', createAdsTestIframe(), false); // Footer
+//const displayCleverAds = () => renderAd('text-div', createCleverAdsIframe(), false); // Main text area
+const displayCleverAds = () => renderAd('.dp-right-side', createCleverAdsIframe(), false); // Footer
+const displayAkcelo = () => renderAd('text-div', createAkceloAdsIframe(), false);
+
+const removeAdsHTMLElements = () => {
+  // TODO: Will have more ads later on
+  const ads = document.querySelectorAll('.dontpad-free');
+  Array.from(ads).forEach(ad => ad.remove());
+}
+
+const displayAds = () => {
+  removeAdsHTMLElements();
+
+  adsbygoogle = window.adsbygoogle || [];
+
+  if (dontpad.links.length) {
+    displayLeftMenuAd();
+  }
+
+  displayRightMenuAd();
+  displayCleverAds()
+  if (window.location.href.includes('/akcelo-test')) displayAkcelo()
+
+  positionAbsoluteElements();
+}
+
+const loadAdsenseIfNecessary = () => {
+  if (!document.getElementById('adsense')) loadAsyncScript('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2087915935349742', 'adsense', 'anonymous');
+}
+
+const handleAds = (showAds) => {
+  if (showAds) {
+    loadAdsenseIfNecessary();
+    displayAds();
+  } else {
+    removeAdsHTMLElements();
+  }
+}
